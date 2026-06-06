@@ -91,7 +91,7 @@ Copie `.env.example` para `.env.local` (local) e configure as mesmas em
 ### Parâmetros de cópia
 | Var | Padrão | Descrição |
 |---|---|---|
-| `COPY_TARGET_WALLETS` | — | Carteiras a copiar (CSV de `0x...`) |
+| `COPY_TARGET_WALLETS` | `@coldmath` | Carteiras a copiar (CSV de `0x...`). Padrão: `0x594edb…1c11` |
 | `COPY_SIZE_MODE` | `fixed` | `fixed` (valor fixo) ou `proportional` (escala do original) |
 | `COPY_FIXED_USDC` | `5` | USDC por ordem (modo fixed) |
 | `COPY_SCALE` | `0.01` | Fração do trade original (modo proportional) |
