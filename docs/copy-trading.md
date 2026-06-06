@@ -67,6 +67,21 @@ externo** (cron-job.org) fazendo GET com o header `Authorization: Bearer $CRON_S
 | `app/api/copy/run/route.js` | Endpoint do cron (protegido) |
 | `app/api/copy/status/route.js` | Status só-leitura (sem segredos) |
 | `.github/workflows/copy-trade.yml` | Agendador autônomo (GitHub Actions, `*/5 * * * *`) |
+| `app/copy/page.js` | Painel read-only do status (`/copy`, pede o `CRON_SECRET`) |
+
+### Modo fiel (mirror)
+
+Padrão. Replica **1:1** o trade do alvo: BUY gasta o **mesmo valor em USDC** que o alvo
+gastou; SELL vende a **mesma quantidade de shares** (limitado ao que você possui). Copia
+**toda** atividade (`COPY_MIN_SOURCE_USDC=0`). Os tetos `COPY_MAX_USDC_PER_TRADE` /
+`COPY_MAX_USDC_PER_RUN` continuam valendo como freio — em modo fiel eles **limitam a
+fidelidade**; para copiar de verdade no mesmo tamanho do alvo, suba-os (e tenha o capital).
+
+### Painel `/copy`
+
+Página read-only em `https://SEU-APP.vercel.app/copy`. Cole o `CRON_SECRET` para ver:
+estado (AO VIVO/SIMULAÇÃO), modo, parâmetros, credenciais presentes, carteiras-alvo +
+último timestamp processado, e o resumo do último ciclo (planejadas/executadas/ignoradas).
 
 ---
 
@@ -92,7 +107,7 @@ Copie `.env.example` para `.env.local` (local) e configure as mesmas em
 | Var | Padrão | Descrição |
 |---|---|---|
 | `COPY_TARGET_WALLETS` | `@coldmath` | Carteiras a copiar (CSV de `0x...`). Padrão: `0x594edb…1c11` |
-| `COPY_SIZE_MODE` | `fixed` | `fixed` (valor fixo) ou `proportional` (escala do original) |
+| `COPY_SIZE_MODE` | `mirror` | `mirror` (cópia **fiel 1:1**) · `fixed` (valor fixo) · `proportional` (escala) |
 | `COPY_FIXED_USDC` | `5` | USDC por ordem (modo fixed) |
 | `COPY_SCALE` | `0.01` | Fração do trade original (modo proportional) |
 | `COPY_MIN_USDC` | `1` | Piso por ordem |

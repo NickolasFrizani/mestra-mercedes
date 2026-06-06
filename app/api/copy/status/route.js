@@ -36,7 +36,14 @@ export async function GET(request) {
   };
 
   return Response.json(
-    { config: cfg, validation, credentials, cursors: state.cursors, seenCount: (state.seen || []).length },
+    {
+      config: cfg,
+      validation,
+      credentials,
+      cursors: state.cursors,
+      seenCount: (state.seen || []).length,
+      lastRun: state.lastRun || null,
+    },
     { headers: { "Cache-Control": "no-store" } }
   );
 }
