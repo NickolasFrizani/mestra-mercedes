@@ -145,9 +145,9 @@ Ferramenta útil para **construir seus próprios agentes de IA** e conectá-los 
 de trabalho de trading. É um framework de agentes em Python, com tipagem forte e validação
 via Pydantic, agnóstico de modelo (funciona com vários provedores de LLM).
 
-> 💡 **Nota para este projeto:** caso integremos IA no `mestra-mercedes` (ex.: assistente
-> de agendamento no `BookingModal`), o padrão recomendado em `AGENTS.md` é usar o
-> **Vercel AI Gateway** com a AI SDK e os modelos Claude mais recentes.
+> 💡 **Nota para este projeto:** caso integremos IA no nosso fluxo de trading, o padrão
+> recomendado em `AGENTS.md` é usar o **Vercel AI Gateway** com a AI SDK e os modelos
+> Claude mais recentes.
 
 ---
 
