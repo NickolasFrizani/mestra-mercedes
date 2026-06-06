@@ -13,7 +13,7 @@ liga conscientemente o `COPY_LIVE=true`.
 ## Como funciona
 
 ```
-Vercel Cron (a cada 5 min)
+Agendador (a cada 5 min) — GitHub Actions
    └─► GET /api/copy/run  (autenticado por CRON_SECRET)
           └─► runCopyCycle()
                  1. lê carteiras-alvo (COPY_TARGET_WALLETS)
@@ -26,8 +26,53 @@ Vercel Cron (a cada 5 min)
 
 - **Estado/dedupe** em **Vercel Blob** (`copy-trade/state.json`): guarda o último timestamp
   por alvo e os trades já copiados, para nunca copiar o mesmo duas vezes.
-- **Vercel é stateless/efêmero**, por isso o estado vive no Blob e o gatilho é um **Cron**
-  (não um processo contínuo) — alinhado ao `AGENTS.md`.
+- **Vercel é stateless/efêmero**, por isso o estado vive no Blob e o gatilho é um
+  **agendador externo** (não um processo contínuo) — alinhado ao `AGENTS.md`.
+
+### Agendamento (a cada 5 min)
+
+O cron **nativo da Vercel no plano Hobby roda no máximo 1×/dia** — inútil para copy
+trading (e um agendamento sub-diário em `vercel.json` **faz o deploy falhar** no Hobby).
+
+> 🔒 **Decisão consciente, por segurança.** O agendador automático **não é versionado**
+> de propósito: nada fica "armado" disparando ordens reais sem você ligar explicitamente.
+> Você cria o gatilho quando decidir, com os passos abaixo.
+
+**Opção A — GitHub Actions (grátis, qualquer plano).** Crie o arquivo
+`.github/workflows/copy-trade.yml` com o conteúdo abaixo, e configure em
+**GitHub → Settings → Secrets and variables → Actions**: o Secret `CRON_SECRET`
+(igual à env da Vercel) e a Variable `COPY_RUN_URL` = `https://SEU-APP.vercel.app/api/copy/run`.
+
+```yaml
+name: Copy Trade (poll)
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch: {}
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          URL: ${{ vars.COPY_RUN_URL }}
+          SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          [ -n "$URL" ] && [ -n "$SECRET" ] || { echo "::error::defina COPY_RUN_URL e CRON_SECRET"; exit 1; }
+          code=$(curl -s -o /tmp/o.json -w "%{http_code}" -H "Authorization: Bearer $SECRET" "$URL")
+          echo "HTTP $code"; jq -r '{ok,live,runSpend,planned:(.planned|length),executed:(.executed|length)}' /tmp/o.json 2>/dev/null || true
+          [ "$code" -lt 500 ] || exit 1
+```
+
+> Workflows agendados só rodam no **branch padrão** (`main`) — não disparam em PRs.
+
+**Opção B — Vercel Pro.** Crie um `vercel.json` com
+`"crons": [{ "path": "/api/copy/run", "schedule": "*/5 * * * *" }]` (a Vercel injeta o
+header `Authorization: Bearer $CRON_SECRET` automaticamente).
+
+**Opção C — agendador externo** (cron-job.org, EasyCron…): faça um GET em
+`/api/copy/run` com o header `Authorization: Bearer $CRON_SECRET`.
+
+Em qualquer opção, comece com `COPY_LIVE=false` e só ligue o live depois de revisar.
 
 ---
 
@@ -43,7 +88,6 @@ Vercel Cron (a cada 5 min)
 | `lib/notify.js` | Alertas WhatsApp via Evolution API |
 | `app/api/copy/run/route.js` | Endpoint do cron (protegido) |
 | `app/api/copy/status/route.js` | Status só-leitura (sem segredos) |
-| `vercel.json` | Agenda do cron (`*/5 * * * *`) |
 
 ---
 
