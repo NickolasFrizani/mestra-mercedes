@@ -1,0 +1,10 @@
+{
+  "_comment": "IDs dos videos da Mestra Mercedes a processar. Usado por scripts/heygen.mjs (inspect-targets / process-targets). 'recriar-avatar-v-final-novo' regenera em Avatar V com MAIN_SCRIPT (467 = principal, roteiro de merecimento/abundancia). 'adicionar-fechamento' baixa o mp4 original e cola o clipe de fechamento via ffmpeg. Os roteiros originais de prosperidade 14/24/29 NAO sao recuperaveis pela API; por isso esses 4 usam concat (nao regeneram).",
+  "videos": [
+    { "video_id": "467be4c8f45e458e8327b7269949b8bb", "acao": "recriar-avatar-v-final-novo", "nota": "principal — TEST_NEWKEY; roteiro novo (MAIN_SCRIPT)" },
+    { "video_id": "d2a2cd2d3a894178a6cf65341c7facfc", "acao": "adicionar-fechamento", "nota": "AV_prosperidade_29" },
+    { "video_id": "7ea393009ea541129f7973b132540425", "acao": "adicionar-fechamento", "nota": "AV_prosperidade_24" },
+    { "video_id": "287f32297ff9481a90378508841a38fe", "acao": "adicionar-fechamento", "nota": "AV_prosperidade_14" },
+    { "video_id": "3761d5a845a347b787d9b5dbfd41f841", "acao": "adicionar-fechamento", "nota": "AV_prosperidade_29 (re-render)" }
+  ]
+}
