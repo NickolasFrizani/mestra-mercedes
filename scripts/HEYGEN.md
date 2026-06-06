@@ -30,18 +30,43 @@ HeyGen. Para liberar:
 
 ## 2. Usar o script
 
+Requer **Node 18+** e **ffmpeg** (para o `concat`/`process-targets`).
+
 ```bash
 export HEYGEN_API_KEY="sk_..."   # se não configurou como env var do ambiente
 
 node scripts/heygen.mjs list-today          # vídeos criados hoje
+node scripts/heygen.mjs inspect-targets     # status dos 4 IDs em heygen-targets.json
 node scripts/heygen.mjs avatars "Avatar V"  # achar o avatar_id do Avatar V
 node scripts/heygen.mjs voices pt           # achar a voice_id em português
 node scripts/heygen.mjs generate <avatar_id> <voice_id>   # gera o vídeo principal (final novo)
 node scripts/heygen.mjs closing  <avatar_id> <voice_id>   # gera só o fechamento padrão
 node scripts/heygen.mjs status <video_id>   # acompanha a renderização
+node scripts/heygen.mjs download <video_id> # baixa o mp4 pronto p/ ./out
+node scripts/heygen.mjs concat <orig.mp4> <fechamento.mp4> <saida.mp4>
 ```
 
-## 3. Sobre "Avatar V", gestos e fechamento
+### Pipeline completo (recomendado)
+
+Faz tudo de uma vez: recria o principal em Avatar V com o final novo, gera o
+fechamento e o concatena nos outros 3. Resultados em `./out/`:
+
+```bash
+node scripts/heygen.mjs process-targets <avatar_id> <voice_id>
+```
+
+## 3. Upload no Google Drive
+
+A pasta `./out/` é ignorada pelo git. O upload é feito pelo **conector MCP do
+Google Drive** (roteado pela Anthropic, não precisa de allowlist): peça ao Claude
+na sessão *"suba os arquivos de `./out` no meu Drive"* e ele lê cada `.mp4` e
+chama `create_file` (mimetype `video/mp4`).
+
+> Observação: o upload via MCP carrega o arquivo em base64 na chamada da
+> ferramenta; para vídeos muito grandes isso pode estourar o limite. Se ocorrer,
+> faça o upload manual de `./out/*.mp4` ou use o app/CLI do Drive.
+
+## 4. Sobre "Avatar V", gestos e fechamento
 
 - **Avatar V**: na API o avatar é referenciado por `avatar_id`. Rode
   `avatars "Avatar V"` para descobrir o id exato na conta. O olhar para a câmera
