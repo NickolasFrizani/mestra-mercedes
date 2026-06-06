@@ -129,6 +129,23 @@ try {
       console.log(JSON.stringify(data?.data || data, null, 2));
       break;
     }
+    case "inspect-targets": {
+      // Le scripts/heygen-targets.json e mostra status + acao de cada video.
+      const { readFileSync } = await import("node:fs");
+      const { fileURLToPath } = await import("node:url");
+      const here = fileURLToPath(new URL(".", import.meta.url));
+      const cfg = JSON.parse(readFileSync(`${here}heygen-targets.json`, "utf8"));
+      for (const t of cfg.videos) {
+        try {
+          const data = await api(`/v1/video_status.get?video_id=${t.video_id}`);
+          const d = data?.data || {};
+          console.log(`- ${t.video_id} [${t.acao}]\n    status: ${d.status}  titulo: ${d.video_title || "?"}  url: ${d.video_url || "-"}`);
+        } catch (e) {
+          console.log(`- ${t.video_id} [${t.acao}]\n    ERRO: ${e.message}`);
+        }
+      }
+      break;
+    }
     case "generate":
     case "closing": {
       const avatarId = args[0];
