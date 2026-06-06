@@ -1,0 +1,31 @@
+{
+  "_comment": "Config unica da automacao HeyGen da Mestra Mercedes. Lido por scripts/heygen.mjs (inspect-targets e process-targets). Edite os roteiros aqui. avatar_id/voice_id podem ficar vazios: na sessao nova o Claude descobre via os comandos 'avatars' e 'voices'.",
+  "settings": {
+    "avatar_label": "Avatar V",
+    "avatar_id": "",
+    "voice_id": "",
+    "avatar_style": "normal",
+    "dimension": { "width": 1080, "height": 1920 },
+    "motion_hint": "Avatar V ja fala olhando para a camera e gesticulando naturalmente. Isto e configuracao do avatar, NAO entra no texto da narracao."
+  },
+  "closing_text": "Com carinho, Mestra Mercedes. Gratidão.",
+  "videos": [
+    {
+      "video_id": "3761d5a845a347b787d9b5dbfd41f841",
+      "acao": "recriar-avatar-v-final-novo",
+      "script": "Você já pensou que talvez não seja falta de dinheiro e sim falta de merecimento? A sua energia financeira, minha querida, começa na relação que você tem consigo mesma. Quem não se valoriza, sem perceber, sabota a própria abundância. Ela não chega de fora, transborda de dentro para fora. Você atrai o caminho da sua abundância e riqueza. Com carinho, Mestra Mercedes. Gratidão."
+    },
+    {
+      "video_id": "d2a2cd2d3a894178a6cf65341c7facfc",
+      "acao": "adicionar-fechamento"
+    },
+    {
+      "video_id": "7ea393009ea541129f7973b132540425",
+      "acao": "adicionar-fechamento"
+    },
+    {
+      "video_id": "287f32297ff9481a90378508841a38fe",
+      "acao": "adicionar-fechamento"
+    }
+  ]
+}
