@@ -39,18 +39,17 @@ const BASE = "https://api.heygen.com";
 const HEADERS = { "X-Api-Key": API_KEY, "Accept": "application/json" };
 const TZ = "America/Sao_Paulo";
 
-// Texto de fechamento padrao pedido pela Mestra Mercedes.
-export const CLOSING_TEXT =
-  "Com carinho, Mestra Mercedes. Gratidao.";
+// Texto de fechamento padrao (fallback; o oficial vem de heygen-targets.json).
+export const CLOSING_TEXT = "Com carinho, Mestra Mercedes. Gratidão.";
 
-// Roteiro novo do video principal (final alterado).
+// Roteiro novo do video principal (fallback; o oficial vem de heygen-targets.json).
 export const MAIN_SCRIPT =
-  "Voce ja pensou que talvez nao seja falta de dinheiro e sim falta de merecimento? " +
-  "A sua energia financeira, minha querida, comeca na relacao que voce tem consigo mesma. " +
-  "Quem nao se valoriza, sem perceber, sabota a propria abundancia. " +
-  "Ela nao chega de fora, transborda de dentro para fora. " +
-  "Voce atrai o caminho da sua abundancia e riqueza. " +
-  "Com carinho, Mestra Mercedes. Gratidao.";
+  "Você já pensou que talvez não seja falta de dinheiro e sim falta de merecimento? " +
+  "A sua energia financeira, minha querida, começa na relação que você tem consigo mesma. " +
+  "Quem não se valoriza, sem perceber, sabota a própria abundância. " +
+  "Ela não chega de fora, transborda de dentro para fora. " +
+  "Você atrai o caminho da sua abundância e riqueza. " +
+  "Com carinho, Mestra Mercedes. Gratidão.";
 
 async function api(path, { method = "GET", body } = {}) {
   const res = await fetch(`${BASE}${path}`, {
@@ -143,9 +142,8 @@ function ffmpegConcat(originalPath, closingPath, outPath) {
   console.log(`  concatenado: ${outPath}`);
 }
 
-function loadTargets() {
-  const cfg = JSON.parse(readFileSync(`${HERE}heygen-targets.json`, "utf8"));
-  return cfg.videos;
+function loadConfig() {
+  return JSON.parse(readFileSync(`${HERE}heygen-targets.json`, "utf8"));
 }
 
 const cmd = process.argv[2];
@@ -203,7 +201,7 @@ try {
     }
     case "inspect-targets": {
       // Le scripts/heygen-targets.json e mostra status + acao de cada video.
-      for (const t of loadTargets()) {
+      for (const t of loadConfig().videos) {
         try {
           const data = await api(`/v1/video_status.get?video_id=${t.video_id}`);
           const d = data?.data || {};
@@ -242,24 +240,27 @@ try {
       break;
     }
     case "process-targets": {
-      const avatarId = args[0];
-      const voiceId = args[1];
-      if (!avatarId || !voiceId) throw new Error("uso: process-targets <avatar_id> <voice_id>");
+      const cfg = loadConfig();
+      // avatar_id/voice_id: argumento da linha de comando OU settings do JSON.
+      const avatarId = args[0] || cfg.settings?.avatar_id;
+      const voiceId = args[1] || cfg.settings?.voice_id;
+      if (!avatarId || !voiceId) throw new Error("falta avatar_id/voice_id (passe por argumento ou preencha em settings no heygen-targets.json)");
+      const closingText = cfg.closing_text || CLOSING_TEXT;
       mkdirSync(OUT_DIR, { recursive: true });
-      const targets = loadTargets();
+      const targets = cfg.videos;
 
       // 1) Gera o clipe de fechamento uma unica vez (reaproveitado em todos).
       console.log("[1/3] Gerando clipe de fechamento...");
-      const closingId = await startGenerate(avatarId, voiceId, CLOSING_TEXT);
+      const closingId = await startGenerate(avatarId, voiceId, closingText);
       const closingUrl = await waitForVideo(closingId);
       const closingPath = `${OUT_DIR}/fechamento.mp4`;
       await downloadTo(closingUrl, closingPath);
 
-      // 2) Recria o principal em Avatar V com o roteiro/final novo.
+      // 2) Recria o principal em Avatar V com o roteiro/final novo (do JSON).
       console.log("[2/3] Recriando o video principal (Avatar V, final novo)...");
       const principal = targets.find((t) => t.acao === "recriar-avatar-v-final-novo");
       if (principal) {
-        const newId = await startGenerate(avatarId, voiceId, MAIN_SCRIPT);
+        const newId = await startGenerate(avatarId, voiceId, principal.script || MAIN_SCRIPT);
         const url = await waitForVideo(newId);
         await downloadTo(url, `${OUT_DIR}/principal-${newId}.mp4`);
       }

@@ -49,11 +49,31 @@ node scripts/heygen.mjs concat <orig.mp4> <fechamento.mp4> <saida.mp4>
 ### Pipeline completo (recomendado)
 
 Faz tudo de uma vez: recria o principal em Avatar V com o final novo, gera o
-fechamento e o concatena nos outros 3. Resultados em `./out/`:
+fechamento e o concatena nos outros 3. Resultados em `./out/`. Os roteiros e o
+fechamento vêm de `heygen-targets.json`. `avatar_id`/`voice_id` podem vir por
+argumento ou preenchidos em `settings` no JSON:
 
 ```bash
 node scripts/heygen.mjs process-targets <avatar_id> <voice_id>
+# ou, se avatar_id/voice_id já estiverem no heygen-targets.json:
+node scripts/heygen.mjs process-targets
 ```
+
+### Prompt pronto para colar na SESSÃO NOVA
+
+Tudo já está configurado em `scripts/heygen-targets.json` (roteiros, fechamento,
+Avatar V). Na sessão nova com o HeyGen ativo, cole isto:
+
+> Rede/HeyGen liberado. Faça, na branch `claude/stoic-keller-HB4na`:
+> 1. `node scripts/heygen.mjs avatars "Avatar V"` e `node scripts/heygen.mjs voices pt`
+>    para achar o `avatar_id` e a `voice_id` da Mestra Mercedes, e preencha em
+>    `settings` no `scripts/heygen-targets.json`.
+> 2. `node scripts/heygen.mjs inspect-targets` para conferir os 4 vídeos.
+> 3. `node scripts/heygen.mjs process-targets` para regerar o principal em Avatar V
+>    com a narração nova e adicionar o fechamento "Com carinho, Mestra Mercedes.
+>    Gratidão." nos outros 3.
+> 4. Suba os `./out/*.mp4` no meu Google Drive (pasta "Mestra Mercedes / Vídeos") e
+>    me mande os links.
 
 ## 3. Upload no Google Drive
 
