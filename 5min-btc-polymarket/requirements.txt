@@ -1,0 +1,8 @@
+# Python dependencies for the 5min BTC Polymarket skill
+# Install with: python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+
+# HTTP client used to query Polymarket Gamma API (market resolution)
+requests>=2.31
+
+# Polymarket CLOB client (orderbooks, auth, order status)
+py-clob-client>=0.17
